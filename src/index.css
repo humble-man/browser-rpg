@@ -827,6 +827,32 @@ input, textarea {
   gap: 8px;
 }
 
+/* === Tab Lock Modal === */
+.lock-backdrop {
+  z-index: 200;  /* above shop modal (100) */
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.lock-modal h3 {
+  color: var(--gold-bright);
+  margin: 0 0 12px;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+}
+
+.lock-modal p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d8ccea;
+  margin: 0 0 12px;
+}
+
+.lock-hint {
+  font-size: 12px;
+  color: #8074a4;
+  font-style: italic;
+}
+
 /* === Dialogue Box === */
 .dialogue-box {
   background: var(--bg-card);
