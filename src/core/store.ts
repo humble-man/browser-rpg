@@ -14,10 +14,10 @@ import { addItem, applyConsumable, countOf, equip, getItem, removeItem } from '.
 import {
   computeOrder,
   enemyAttackDamage,
-  enemyChooseAction,
   playerAttackDamage,
   tryFlee,
 } from '../systems/battle';
+import { chooseEnemyAction } from '../systems/enemy-ai';
 import { rollEncounter } from '../systems/encounter';
 import { applyXp, xpForNextLevel } from '../systems/leveling';
 import { loadFromStorage, saveToStorage, SAVE_KEY } from './save';
@@ -456,15 +456,59 @@ export const useGame = create<GameStore>()(
       const b = state.battle;
       if (!b || b.phase !== 'enemy') return;
 
-      enemyChooseAction(b.enemy, b);
+      const intent = chooseEnemyAction(b.enemy, b.enemyCurrentHp, b.enemyCurrentMp, SKILLS);
+
+      // === Item (heal) ===
+      if (intent.type === 'item') {
+        const item = getItem(intent.itemId);
+        if (item?.effect?.type === 'heal') {
+          const amount = item.effect.amount ?? 0;
+          set(s => {
+            if (!s.battle) return;
+            const before = s.battle.enemyCurrentHp;
+            s.battle.enemyCurrentHp = Math.min(s.battle.enemy.maxHp, before + amount);
+            // Consume from AI pool
+            const ai = s.battle.enemy.ai;
+            if (ai) {
+              const slot = ai.items.find(i => i.itemId === intent.itemId);
+              if (slot) {
+                slot.count -= 1;
+                if (slot.count <= 0) ai.items = ai.items.filter(i => i.itemId !== intent.itemId);
+              }
+            }
+            pushLog(s.battle, `💚 ${s.battle.enemy.name} 使用${item.name}，回復 ${s.battle.enemyCurrentHp - before} HP`);
+            s.battle.lastDamage = undefined;
+            s.battle.phase = 'animating';
+          });
+        }
+        return;
+      }
+
+      // === Attack or skill — both deal damage to player ===
       const wasDefending = state.player.defending;
-      const { dmg, crit } = enemyAttackDamage(b.enemy, state.player, wasDefending);
+      let power = 1.0;
+      let mpCost = 0;
+      let logPrefix = '💢';
+      let actionDesc = `${b.enemy.name} 反擊`;
+
+      if (intent.type === 'skill') {
+        const skill = SKILLS[intent.skillId];
+        if (skill?.type === 'attack') {
+          power = skill.power;
+          mpCost = skill.mpCost;
+          logPrefix = '🔥';
+          actionDesc = `${b.enemy.name} 施放${skill.name}`;
+        }
+      }
+
+      const { dmg, crit } = enemyAttackDamage(b.enemy, state.player, wasDefending, power);
 
       set(s => {
         s.player.hp = Math.max(0, s.player.hp - dmg);
         if (wasDefending) s.player.defending = false; // consume the defend stance
         if (s.battle) {
-          pushLog(s.battle, `💢 ${s.battle.enemy.name} 反擊，造成 ${dmg} 傷害${crit ? '（爆擊！）' : ''}`);
+          if (mpCost > 0) s.battle.enemyCurrentMp = Math.max(0, s.battle.enemyCurrentMp - mpCost);
+          pushLog(s.battle, `${logPrefix} ${actionDesc}，造成 ${dmg} 傷害${crit ? '（爆擊！）' : ''}`);
           s.battle.lastDamage = { target: 'player', amount: dmg, crit };
           s.battle.phase = 'animating';
         }

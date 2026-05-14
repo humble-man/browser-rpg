@@ -71,6 +71,10 @@
     "def": 12,
     "spd": 8,
     "xpReward": 250,
-    "goldReward": 120
+    "goldReward": 120,
+    "ai": {
+      "items": [{ "itemId": "potion", "count": 2 }],
+      "skills": ["fireball"]
+    }
   }
 }
