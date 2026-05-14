@@ -1,0 +1,26 @@
+{
+  "attack": {
+    "id": "attack",
+    "name": "普通攻擊",
+    "mpCost": 0,
+    "type": "attack",
+    "power": 1.0,
+    "description": "基礎物理攻擊"
+  },
+  "fireball": {
+    "id": "fireball",
+    "name": "火球術",
+    "mpCost": 5,
+    "type": "attack",
+    "power": 1.8,
+    "description": "釋放火球，造成 1.8 倍傷害"
+  },
+  "heal": {
+    "id": "heal",
+    "name": "治癒術",
+    "mpCost": 4,
+    "type": "heal",
+    "power": 28,
+    "description": "恢復 28 點 HP"
+  }
+}

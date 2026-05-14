@@ -1,0 +1,42 @@
+{
+  "potion": {
+    "id": "potion",
+    "name": "補血藥水",
+    "type": "consumable",
+    "description": "恢復 30 點 HP",
+    "price": 20,
+    "effect": { "type": "heal", "amount": 30 }
+  },
+  "ether": {
+    "id": "ether",
+    "name": "魔力藥水",
+    "type": "consumable",
+    "description": "恢復 20 點 MP",
+    "price": 30,
+    "effect": { "type": "restoreMp", "amount": 20 }
+  },
+  "antidote": {
+    "id": "antidote",
+    "name": "解毒劑",
+    "type": "consumable",
+    "description": "完全恢復 HP（緊急用）",
+    "price": 80,
+    "effect": { "type": "heal", "amount": 999 }
+  },
+  "iron-sword": {
+    "id": "iron-sword",
+    "name": "鐵劍",
+    "type": "weapon",
+    "description": "攻擊力 +8",
+    "price": 180,
+    "bonus": { "atk": 8 }
+  },
+  "leather-armor": {
+    "id": "leather-armor",
+    "name": "皮甲",
+    "type": "armor",
+    "description": "防禦力 +5",
+    "price": 140,
+    "bonus": { "def": 5 }
+  }
+}
