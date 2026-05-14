@@ -2,6 +2,8 @@
 
 > A classic turn-based RPG playable directly in the browser. 2D cartoon style, no install required.
 
+🌐 **Play online**: [humble-man.github.io/browser-rpg](https://humble-man.github.io/browser-rpg/)
+
 打開瀏覽器即玩的回合制冒險：探索 → 隨機遇敵 → 回合戰鬥 → 升等 → 商店 → 打倒迷宮頭目。
 
 ## 開始遊玩
