@@ -1,0 +1,18 @@
+# Harness-engineering stage labels.
+# These need to be applied to the repo via a label sync tool — committing this file does NOT auto-create the labels on GitHub.
+
+- name: stage:intent
+  color: EEEDFE
+  description: "Stage 1 — 提案 intent captured"
+- name: stage:analysis
+  color: AFA9EC
+  description: "Stage 2 — 分析 analysis completed"
+- name: stage:design
+  color: 7F77DD
+  description: "Stage 3 — 設計 design completed"
+- name: stage:verify
+  color: 3C3489
+  description: "Stage 4 — 驗證 under verification"
+- name: stage:done
+  color: 26215C
+  description: "Stage 5 — 完成 shipped and closed"
