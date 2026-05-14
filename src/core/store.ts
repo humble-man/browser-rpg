@@ -12,6 +12,7 @@ import MONSTERS_RAW from '../data/monsters.json';
 import SKILLS_RAW from '../data/skills.json';
 import { addItem, applyConsumable, countOf, equip, getItem, removeItem } from '../systems/inventory';
 import {
+  computeOrder,
   enemyAttackDamage,
   enemyChooseAction,
   playerAttackDamage,
@@ -80,7 +81,8 @@ export interface GameStore {
   // battle
   startBattle: (monsterId: string, isBoss?: boolean) => void;
   playerAct: (action: 'attack' | 'skill' | 'item' | 'defend' | 'flee', payload?: string) => void;
-  advanceEnemyTurn: () => void;
+  advanceTurn: () => void;
+  enemyAct: () => void;
   closeBattle: () => void;
 
   // shop
@@ -286,6 +288,9 @@ export const useGame = create<GameStore>()(
       if (!m) return;
       // Deep copy monster stats so we can mutate currentHp etc.
       const enemy: Monster = JSON.parse(JSON.stringify(m));
+      const order = computeOrder(get().player.spd, enemy.spd);
+      const log: string[] = [`⚔️ ${enemy.name} 出現了！`];
+      if (order[0] === 'enemy') log.push('💨 敵方先攻');
       set(s => {
         s.scene = 'battle';
         s.player.defending = false;
@@ -294,9 +299,11 @@ export const useGame = create<GameStore>()(
           enemyCurrentHp: enemy.hp,
           enemyCurrentMp: enemy.mp,
           turn: 1,
-          log: [`⚔️ ${enemy.name} 出現了！`],
-          phase: 'player',
+          log,
+          phase: order[0] === 'player' ? 'player' : 'enemy',
           isBoss,
+          actionQueue: order,
+          queueIndex: 0,
         };
       });
     },
@@ -422,33 +429,47 @@ export const useGame = create<GameStore>()(
         return;
       }
 
-      // If not flee/won and animating, schedule enemy turn
-      const post2 = get().battle;
-      if (post2 && post2.phase === 'animating') {
-        // Auto-advance to enemy turn
-        // (Component layer will call advanceEnemyTurn after animation delay)
-      }
+      // Animating phase set; Battle.tsx will call advanceTurn() after delay.
     },
 
-    advanceEnemyTurn: () => {
-      const state = get();
-      const b = state.battle;
+    advanceTurn: () => {
+      const b = get().battle;
       if (!b) return;
       if (b.phase === 'won' || b.phase === 'lost' || b.phase === 'fled') return;
 
-      // Enemy attacks
+      set(s => {
+        if (!s.battle) return;
+        s.battle.queueIndex += 1;
+        if (s.battle.queueIndex >= s.battle.actionQueue.length) {
+          // Turn end — recompute order for next turn (placeholder for future SPD buffs)
+          s.battle.turn += 1;
+          s.battle.queueIndex = 0;
+          s.battle.actionQueue = computeOrder(s.player.spd, s.battle.enemy.spd);
+        }
+        const next = s.battle.actionQueue[s.battle.queueIndex];
+        s.battle.phase = next === 'player' ? 'player' : 'enemy';
+      });
+    },
+
+    enemyAct: () => {
+      const state = get();
+      const b = state.battle;
+      if (!b || b.phase !== 'enemy') return;
+
       enemyChooseAction(b.enemy, b);
-      const { dmg, crit } = enemyAttackDamage(b.enemy, state.player, state.player.defending);
+      const wasDefending = state.player.defending;
+      const { dmg, crit } = enemyAttackDamage(b.enemy, state.player, wasDefending);
+
       set(s => {
         s.player.hp = Math.max(0, s.player.hp - dmg);
+        if (wasDefending) s.player.defending = false; // consume the defend stance
         if (s.battle) {
           pushLog(s.battle, `💢 ${s.battle.enemy.name} 反擊，造成 ${dmg} 傷害${crit ? '（爆擊！）' : ''}`);
           s.battle.lastDamage = { target: 'player', amount: dmg, crit };
-          s.battle.turn += 1;
+          s.battle.phase = 'animating';
         }
       });
 
-      // Defeat?
       if (get().player.hp <= 0) {
         set(s => {
           if (s.battle) {
@@ -456,10 +477,7 @@ export const useGame = create<GameStore>()(
             s.battle.phase = 'lost';
           }
         });
-        return;
       }
-
-      set(s => { if (s.battle) s.battle.phase = 'player'; });
     },
 
     closeBattle: () => {

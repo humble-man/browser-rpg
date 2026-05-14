@@ -1,5 +1,9 @@
-import type { BattleState, Monster, Player, Skill } from '../core/types';
+import type { Actor, BattleState, Monster, Player, Skill } from '../core/types';
 import { chance, randInt } from '../core/rng';
+
+export function computeOrder(playerSpd: number, enemySpd: number): Actor[] {
+  return playerSpd >= enemySpd ? ['player', 'enemy'] : ['enemy', 'player'];
+}
 
 const CRIT_CHANCE = 0.08;
 const CRIT_MULT = 1.6;

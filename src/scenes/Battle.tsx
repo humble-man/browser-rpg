@@ -10,17 +10,18 @@ export function Battle() {
   const player = useGame(s => s.player);
   const battle = useGame(s => s.battle);
   const playerAct = useGame(s => s.playerAct);
-  const advanceEnemyTurn = useGame(s => s.advanceEnemyTurn);
+  const advanceTurn = useGame(s => s.advanceTurn);
+  const enemyAct = useGame(s => s.enemyAct);
   const closeBattle = useGame(s => s.closeBattle);
   const [menu, setMenu] = useState<Menu>('main');
   const [shakeEnemy, setShakeEnemy] = useState(false);
   const [shakePlayer, setShakePlayer] = useState(false);
 
-  // After animating phase, schedule enemy turn
+  // Drive phase transitions: animating -> advanceTurn, enemy -> enemyAct.
   useEffect(() => {
     if (!battle) return;
+
     if (battle.phase === 'animating') {
-      // Animate damage flash
       if (battle.lastDamage?.target === 'enemy') {
         setShakeEnemy(true);
         setTimeout(() => setShakeEnemy(false), 400);
@@ -28,16 +29,19 @@ export function Battle() {
         setShakePlayer(true);
         setTimeout(() => setShakePlayer(false), 400);
       }
-      const t = setTimeout(() => {
-        advanceEnemyTurn();
-      }, 700);
+      const t = setTimeout(() => advanceTurn(), 700);
       return () => clearTimeout(t);
     }
+
+    if (battle.phase === 'enemy') {
+      const t = setTimeout(() => enemyAct(), 600);
+      return () => clearTimeout(t);
+    }
+
     if (battle.phase === 'player') {
-      // Reset to main menu when player's turn starts
       setMenu('main');
     }
-  }, [battle?.phase, advanceEnemyTurn, battle]);
+  }, [battle?.phase, advanceTurn, enemyAct, battle]);
 
   if (!battle) return null;
 

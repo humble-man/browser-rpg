@@ -101,6 +101,7 @@ export interface GameMap {
   spawn: { x: number; y: number };
 }
 
+export type Actor = 'player' | 'enemy';
 export type BattlePhase = 'player' | 'animating' | 'enemy' | 'won' | 'lost' | 'fled';
 
 export interface BattleState {
@@ -111,5 +112,7 @@ export interface BattleState {
   log: string[];
   phase: BattlePhase;
   isBoss: boolean;
+  actionQueue: Actor[];
+  queueIndex: number;
   lastDamage?: { target: 'player' | 'enemy'; amount: number; crit?: boolean };
 }
