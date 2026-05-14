@@ -16,10 +16,12 @@ const TILE_GLYPH: Record<string, string> = {
   'village-exit': '🚪',
   boss: '🐉',
   sign: '📜',
+  treasure: '📦',
 };
 
 export function Overworld() {
   const player = useGame(s => s.player);
+  const flags = useGame(s => s.flags);
   const movePlayer = useGame(s => s.movePlayer);
   const messages = useGame(s => s.messages);
   const shopOpen = useGame(s => s.shopOpen);
@@ -70,12 +72,17 @@ export function Overworld() {
           {map.tiles.flatMap((row, y) =>
             row.map((tile, x) => {
               const isPlayer = player.position.x === x && player.position.y === y;
+              let glyph: string = TILE_GLYPH[tile.type] ?? '';
+              if (tile.type === 'treasure') {
+                const opened = flags[`treasure-${player.position.mapId}-${x}-${y}`];
+                glyph = opened ? '📭' : '📦';
+              }
               return (
                 <div
                   key={`${x}-${y}`}
                   className={`tile tile-${tile.type}${isPlayer ? ' tile-player' : ''}`}
                 >
-                  {isPlayer ? '🧙' : TILE_GLYPH[tile.type] ?? ''}
+                  {isPlayer ? '🧙' : glyph}
                 </div>
               );
             }),
