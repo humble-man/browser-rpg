@@ -1,4 +1,4 @@
-import type { Actor, BattleState, Monster, Player, Skill } from '../core/types';
+import type { Actor, Monster, Player, Skill } from '../core/types';
 import { chance, randInt } from '../core/rng';
 
 export function computeOrder(playerSpd: number, enemySpd: number): Actor[] {
@@ -30,15 +30,10 @@ export function tryFlee(playerSpd: number, enemySpd: number, isBoss: boolean): b
   return chance(p);
 }
 
-// Very simple enemy AI: low HP -> attack hardest; otherwise normal attack.
-export function enemyChooseAction(_enemy: Monster, _battle: BattleState): 'attack' {
-  return 'attack';
-}
-
 export function playerAttackDamage(player: Player, enemy: Monster, skill: Skill) {
   return computeDamage(player.atk, enemy.def, skill.power, false);
 }
 
-export function enemyAttackDamage(enemy: Monster, player: Player, isDefending: boolean) {
-  return computeDamage(enemy.atk, player.def, 1.0, isDefending);
+export function enemyAttackDamage(enemy: Monster, player: Player, isDefending: boolean, power = 1.0) {
+  return computeDamage(enemy.atk, player.def, power, isDefending);
 }

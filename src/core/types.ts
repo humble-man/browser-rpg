@@ -34,6 +34,16 @@ export interface Player extends Stats {
   defending: boolean;
 }
 
+export interface EnemyAI {
+  items: { itemId: string; count: number }[];
+  skills: string[];
+}
+
+export type EnemyActionIntent =
+  | { type: 'attack' }
+  | { type: 'skill'; skillId: string }
+  | { type: 'item'; itemId: string };
+
 export interface Monster {
   id: string;
   name: string;
@@ -48,6 +58,7 @@ export interface Monster {
   xpReward: number;
   goldReward: number;
   drops?: { itemId: string; chance: number }[];
+  ai?: EnemyAI;
 }
 
 export type ItemType = 'consumable' | 'weapon' | 'armor';
