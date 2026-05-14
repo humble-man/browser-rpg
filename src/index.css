@@ -369,6 +369,11 @@ input, textarea {
   animation: pulse-boss 1.8s ease-in-out infinite;
 }
 
+.tile-treasure {
+  background: linear-gradient(135deg, #c0a040, #8a7020);
+  box-shadow: 0 0 8px rgba(212, 166, 76, 0.4);
+}
+
 @keyframes pulse-boss {
   0%, 100% { box-shadow: 0 0 8px rgba(192, 42, 74, 0.5); }
   50% { box-shadow: 0 0 24px rgba(255, 100, 130, 0.9); }

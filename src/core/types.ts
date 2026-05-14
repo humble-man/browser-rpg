@@ -94,11 +94,17 @@ export type TileType =
   | 'village-exit'
   | 'boss'
   | 'sign'
-  | 'floor';
+  | 'floor'
+  | 'treasure';
 
 export interface MapTile {
   type: TileType;
   label?: string;
+}
+
+export interface TreasureContent {
+  itemId: string;
+  count: number;
 }
 
 export interface GameMap {
@@ -110,6 +116,7 @@ export interface GameMap {
   encounters?: string[];
   encounterRate?: number;
   spawn: { x: number; y: number };
+  treasures?: Record<string, TreasureContent>;
 }
 
 export type Actor = 'player' | 'enemy';

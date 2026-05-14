@@ -130,6 +130,14 @@ export const useGame = create<GameStore>()(
     loadGame: () => {
       const raw = loadFromStorage();
       if (!raw) return false;
+      // Migration: if the saved position lands on a wall in the current map
+      // (map layout may have changed across versions), reset to spawn.
+      const map = MAPS[raw.player.position.mapId];
+      const tile = map.tiles[raw.player.position.y]?.[raw.player.position.x];
+      if (!tile || tile.type === 'wall') {
+        raw.player.position.x = map.spawn.x;
+        raw.player.position.y = map.spawn.y;
+      }
       set(s => {
         s.player = raw.player;
         s.flags = raw.flags ?? {};
@@ -263,6 +271,25 @@ export const useGame = create<GameStore>()(
       if (movedTile.type === 'boss') {
         if (!get().bossDefeated) {
           get().startBattle('dragon', true);
+        }
+        return;
+      }
+      if (movedTile.type === 'treasure') {
+        const flagKey = `treasure-${mapId}-${nx}-${ny}`;
+        if (get().flags[flagKey]) {
+          set(s => { s.messages.push('📭 空寶箱'); });
+          return;
+        }
+        const content = MAPS[mapId].treasures?.[`${nx},${ny}`];
+        if (content) {
+          set(s => {
+            addItem(s.player, content.itemId, content.count);
+            const item = getItem(content.itemId);
+            const name = item?.name ?? content.itemId;
+            s.flags[flagKey] = true;
+            s.messages.push(`📦 拾獲「${name}」×${content.count}`);
+          });
+          get().saveGame();
         }
         return;
       }
