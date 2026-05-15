@@ -8,6 +8,7 @@ import { ItemsModal } from '../ui/ItemsModal';
 import { DialogModal } from '../ui/DialogModal';
 import { Shop } from './Shop';
 import { xpForNextLevel } from '../core/store';
+import { isMuted, setMuted, playSE } from '../core/audio';
 
 const TILE_GLYPH: Record<string, string> = {
   grass: '·',
@@ -37,6 +38,7 @@ export function Overworld() {
   const [showMenu, setShowMenu] = useState(false);
   const [showEquip, setShowEquip] = useState(false);
   const [showItems, setShowItems] = useState(false);
+  const [mutedState, setMutedState] = useState(isMuted());
 
   const map = MAPS[player.position.mapId];
   const xpNext = useMemo(() => xpForNextLevel(player.level), [player.level]);
@@ -53,7 +55,7 @@ export function Overworld() {
       else if (k === 'arrowdown' || k === 's') { movePlayer(0, 1); e.preventDefault(); }
       else if (k === 'arrowleft' || k === 'a') { movePlayer(-1, 0); e.preventDefault(); }
       else if (k === 'arrowright' || k === 'd') { movePlayer(1, 0); e.preventDefault(); }
-      else if (k === 'escape') { setShowMenu(true); }
+      else if (k === 'escape') { setShowMenu(true); playSE('menu'); }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -163,6 +165,18 @@ export function Overworld() {
             <h3>系統選單</h3>
             <MenuButton fullWidth onClick={() => { setShowMenu(false); setShowEquip(true); }}>🎒 裝備</MenuButton>
             <MenuButton fullWidth onClick={() => { setShowMenu(false); setShowItems(true); }}>🧪 道具</MenuButton>
+            <MenuButton
+              fullWidth
+              variant={mutedState ? 'secondary' : 'primary'}
+              onClick={() => {
+                const next = !mutedState;
+                setMuted(next);
+                setMutedState(next);
+                if (!next) playSE('menu');
+              }}
+            >
+              {mutedState ? '🔇 已靜音（點擊開聲）' : '🔊 聲音開啟（點擊靜音）'}
+            </MenuButton>
             <MenuButton fullWidth onClick={() => { saveGame(); setShowMenu(false); }}>💾 存檔</MenuButton>
             <MenuButton fullWidth variant="secondary" onClick={() => {
               const json = exportSave();

@@ -26,6 +26,7 @@ import { rollEncounter } from '../systems/encounter';
 import { applyXp, xpForNextLevel } from '../systems/leveling';
 import { loadFromStorage, saveToStorage, SAVE_KEY } from './save';
 import { chance } from './rng';
+import { playSE } from './audio';
 
 const MONSTERS = MONSTERS_RAW as Record<string, Monster>;
 const SKILLS = SKILLS_RAW as Record<string, Skill>;
@@ -426,6 +427,7 @@ export const useGame = create<GameStore>()(
         case 'attack': {
           const skill = SKILLS['attack'];
           const { dmg, crit } = playerAttackDamage(state.player, b.enemy, skill);
+          playSE(crit ? 'crit' : 'attack');
           set(s => {
             if (!s.battle) return;
             s.battle.enemyCurrentHp = Math.max(0, s.battle.enemyCurrentHp - dmg);
@@ -445,6 +447,7 @@ export const useGame = create<GameStore>()(
           set(s => { s.player.mp -= skill.mpCost; });
           if (skill.type === 'attack') {
             const { dmg, crit } = playerAttackDamage(state.player, b.enemy, skill);
+            playSE(crit ? 'crit' : 'attack');
             set(s => {
               if (!s.battle) return;
               s.battle.enemyCurrentHp = Math.max(0, s.battle.enemyCurrentHp - dmg);
@@ -453,6 +456,7 @@ export const useGame = create<GameStore>()(
               s.battle.phase = 'animating';
             });
           } else if (skill.type === 'heal') {
+            playSE('heal');
             set(s => {
               const before = s.player.hp;
               s.player.hp = Math.min(s.player.maxHp, s.player.hp + skill.power);
@@ -467,6 +471,7 @@ export const useGame = create<GameStore>()(
         case 'item': {
           const itemId = payload ?? '';
           if (countOf(state.player, itemId) <= 0) return;
+          playSE('heal');
           set(s => {
             const desc = applyConsumable(s.player, itemId);
             if (!desc) return;
@@ -585,6 +590,7 @@ export const useGame = create<GameStore>()(
         const item = getItem(intent.itemId);
         if (item?.effect?.type === 'heal') {
           const amount = item.effect.amount ?? 0;
+          playSE('heal');
           set(s => {
             if (!s.battle) return;
             const before = s.battle.enemyCurrentHp;
@@ -624,6 +630,7 @@ export const useGame = create<GameStore>()(
       }
 
       const { dmg, crit } = enemyAttackDamage(b.enemy, state.player, wasDefending, power);
+      playSE(crit ? 'crit' : 'attack');
 
       set(s => {
         s.player.hp = Math.max(0, s.player.hp - dmg);
@@ -706,6 +713,7 @@ export const useGame = create<GameStore>()(
       const item = getItem(itemId);
       if (!item || item.type !== 'consumable') return;
       if (countOf(get().player, itemId) <= 0) return;
+      playSE('heal');
       set(s => {
         const desc = applyConsumable(s.player, itemId);
         if (!desc) return;

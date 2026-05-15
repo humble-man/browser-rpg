@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useGame } from '../core/store';
+import { playSE } from '../core/audio';
 
 const AUTO_CLOSE_MS = 2000;
 
@@ -9,6 +10,7 @@ export function LevelUpOverlay() {
 
   useEffect(() => {
     if (!pending) return;
+    playSE('levelup');
     const t = setTimeout(clear, AUTO_CLOSE_MS);
     return () => clearTimeout(t);
   }, [pending, clear]);
