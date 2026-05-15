@@ -832,6 +832,60 @@ input, textarea {
   gap: 8px;
 }
 
+/* === Equip Modal === */
+.equip-modal { max-width: 480px; }
+
+.equip-current {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--purple);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.equip-slot {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.equip-slot-label {
+  color: #b8a8d0;
+  min-width: 60px;
+}
+
+.equip-slot-value {
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+
+.equip-bonus {
+  color: #66f088;
+  font-size: 11px;
+  font-family: monospace;
+}
+
+.equip-list-title {
+  color: var(--gold-bright);
+  font-size: 14px;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+.equip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
 /* === Tab Lock Modal === */
 .lock-backdrop {
   z-index: 200;  /* above shop modal (100) */
