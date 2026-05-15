@@ -95,7 +95,8 @@ export type TileType =
   | 'boss'
   | 'sign'
   | 'floor'
-  | 'treasure';
+  | 'treasure'
+  | 'npc';
 
 export interface MapTile {
   type: TileType;
@@ -105,6 +106,22 @@ export interface MapTile {
 export interface TreasureContent {
   itemId: string;
   count: number;
+}
+
+export interface DialogLine {
+  speaker: string;
+  text: string;
+}
+
+export interface NpcData {
+  name: string;
+  emoji: string;
+  lines: DialogLine[];
+}
+
+export interface ActiveDialog {
+  npc: NpcData;
+  lineIndex: number;
 }
 
 export interface GameMap {
@@ -117,6 +134,7 @@ export interface GameMap {
   encounterRate?: number;
   spawn: { x: number; y: number };
   treasures?: Record<string, TreasureContent>;
+  npcs?: Record<string, NpcData>;
 }
 
 export type Actor = 'player' | 'enemy';
