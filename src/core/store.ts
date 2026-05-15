@@ -91,6 +91,9 @@ export interface GameStore {
   buy: (itemId: string) => void;
   sell: (itemId: string) => void;
   equipItem: (itemId: string) => void;
+
+  // inventory (outside battle)
+  useItem: (itemId: string) => void;
 }
 
 function pushLog(b: BattleState, line: string) {
@@ -604,6 +607,18 @@ export const useGame = create<GameStore>()(
           const it = getItem(itemId);
           s.messages.push(`✅ 已裝備「${it?.name ?? itemId}」`);
         }
+      });
+    },
+
+    useItem: (itemId) => {
+      const item = getItem(itemId);
+      if (!item || item.type !== 'consumable') return;
+      if (countOf(get().player, itemId) <= 0) return;
+      set(s => {
+        const desc = applyConsumable(s.player, itemId);
+        if (!desc) return;
+        removeItem(s.player, itemId, 1);
+        s.messages.push(`🧪 使用「${item.name}」 — ${desc}`);
       });
     },
   })),

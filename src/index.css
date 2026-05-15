@@ -832,6 +832,18 @@ input, textarea {
   gap: 8px;
 }
 
+/* === Items Modal === */
+.items-modal { max-width: 480px; }
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
 /* === Equip Modal === */
 .equip-modal { max-width: 480px; }
 
