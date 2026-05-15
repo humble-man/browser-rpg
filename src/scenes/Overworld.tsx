@@ -4,6 +4,7 @@ import { MAPS } from '../data/maps';
 import { MenuButton } from '../ui/MenuButton';
 import { HpBar } from '../ui/HpBar';
 import { EquipModal } from '../ui/EquipModal';
+import { ItemsModal } from '../ui/ItemsModal';
 import { Shop } from './Shop';
 import { xpForNextLevel } from '../core/store';
 
@@ -31,6 +32,7 @@ export function Overworld() {
   const exportSave = useGame(s => s.exportSave);
   const [showMenu, setShowMenu] = useState(false);
   const [showEquip, setShowEquip] = useState(false);
+  const [showItems, setShowItems] = useState(false);
 
   const map = MAPS[player.position.mapId];
   const xpNext = useMemo(() => xpForNextLevel(player.level), [player.level]);
@@ -40,6 +42,7 @@ export function Overworld() {
       if (shopOpen) return;
       if (showMenu) return;
       if (showEquip) return;
+      if (showItems) return;
       const k = e.key.toLowerCase();
       if (k === 'arrowup' || k === 'w') { movePlayer(0, -1); e.preventDefault(); }
       else if (k === 'arrowdown' || k === 's') { movePlayer(0, 1); e.preventDefault(); }
@@ -49,7 +52,7 @@ export function Overworld() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [movePlayer, shopOpen, showMenu, showEquip]);
+  }, [movePlayer, shopOpen, showMenu, showEquip, showItems]);
 
   return (
     <div className="overworld-scene">
@@ -139,12 +142,14 @@ export function Overworld() {
       {shopOpen && <Shop />}
 
       {showEquip && <EquipModal onClose={() => setShowEquip(false)} />}
+      {showItems && <ItemsModal onClose={() => setShowItems(false)} />}
 
       {showMenu && (
         <div className="modal-backdrop" onClick={() => setShowMenu(false)}>
           <div className="modal-card" onClick={e => e.stopPropagation()}>
             <h3>系統選單</h3>
             <MenuButton fullWidth onClick={() => { setShowMenu(false); setShowEquip(true); }}>🎒 裝備</MenuButton>
+            <MenuButton fullWidth onClick={() => { setShowMenu(false); setShowItems(true); }}>🧪 道具</MenuButton>
             <MenuButton fullWidth onClick={() => { saveGame(); setShowMenu(false); }}>💾 存檔</MenuButton>
             <MenuButton fullWidth variant="secondary" onClick={() => {
               const json = exportSave();
