@@ -108,9 +108,17 @@ export interface TreasureContent {
   count: number;
 }
 
+export type DialogAction = 'close' | 'accept-quest' | 'claim-reward';
+
+export interface DialogChoice {
+  text: string;
+  action: DialogAction;
+}
+
 export interface DialogLine {
   speaker: string;
   text: string;
+  choices?: DialogChoice[];
 }
 
 export interface NpcData {

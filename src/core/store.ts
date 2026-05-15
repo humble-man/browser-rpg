@@ -3,6 +3,8 @@ import { immer } from 'zustand/middleware/immer';
 import type {
   ActiveDialog,
   BattleState,
+  DialogAction,
+  DialogLine,
   Monster,
   Player,
   SceneId,
@@ -99,11 +101,53 @@ export interface GameStore {
 
   // dialog
   advanceDialog: () => void;
+  handleDialogChoice: (action: DialogAction) => void;
 }
 
 function pushLog(b: BattleState, line: string) {
   b.log.push(line);
   if (b.log.length > MAX_LOG) b.log.shift();
+}
+
+const QUEST_ACCEPT = 'quest-elder-accepted';
+const QUEST_DONE = 'quest-elder-completed';
+const QUEST_REWARD = 'quest-elder-rewarded';
+
+const ELDER_INITIAL: DialogLine[] = [
+  { speaker: '村長', text: '歡迎來到碧楓村，年輕的冒險者。' },
+  { speaker: '村長', text: '最近村南的幽影迷宮鬧出怪事⋯野獸增加、夜裡有奇怪聲響。' },
+  {
+    speaker: '村長',
+    text: '若你願意幫忙調查，全村都會感謝你。',
+    choices: [
+      { text: '⚔️ 接受任務', action: 'accept-quest' },
+      { text: '之後再說', action: 'close' },
+    ],
+  },
+];
+
+const ELDER_IN_PROGRESS: DialogLine[] = [
+  { speaker: '村長', text: '辛苦了，幽魂龍解決了嗎？小心啊。' },
+];
+
+const ELDER_CLAIM: DialogLine[] = [
+  { speaker: '村長', text: '你做到了！全村得救了！' },
+  {
+    speaker: '村長',
+    text: '這是村人湊出的謝禮，請收下。',
+    choices: [{ text: '💰 領取獎勵 (+500G)', action: 'claim-reward' }],
+  },
+];
+
+const ELDER_REWARDED: DialogLine[] = [
+  { speaker: '村長', text: '謝謝你，碧楓村得救了。' },
+];
+
+function pickElderLines(flags: Record<string, boolean>): DialogLine[] {
+  if (flags[QUEST_REWARD]) return ELDER_REWARDED;
+  if (flags[QUEST_DONE]) return ELDER_CLAIM;
+  if (flags[QUEST_ACCEPT]) return ELDER_IN_PROGRESS;
+  return ELDER_INITIAL;
 }
 
 export const useGame = create<GameStore>()(
@@ -285,8 +329,15 @@ export const useGame = create<GameStore>()(
       }
       if (movedTile.type === 'npc') {
         const npc = MAPS[mapId].npcs?.[`${nx},${ny}`];
-        if (npc && npc.lines.length > 0) {
-          set(s => { s.activeDialog = { npc, lineIndex: 0 }; });
+        if (npc) {
+          // Village elder gets state-driven lines based on quest flags
+          let lines = npc.lines;
+          if (mapId === 'village' && nx === 2 && ny === 2) {
+            lines = pickElderLines(get().flags);
+          }
+          if (lines.length > 0) {
+            set(s => { s.activeDialog = { npc: { ...npc, lines }, lineIndex: 0 }; });
+          }
         }
         return;
       }
@@ -466,7 +517,10 @@ export const useGame = create<GameStore>()(
             }
           }
           s.battle.phase = 'won';
-          if (s.battle.isBoss) s.bossDefeated = true;
+          if (s.battle.isBoss) {
+            s.bossDefeated = true;
+            s.flags[QUEST_DONE] = true;
+          }
         });
         get().saveGame();
         return;
@@ -643,6 +697,34 @@ export const useGame = create<GameStore>()(
           s.activeDialog = null;
         }
       });
+    },
+
+    handleDialogChoice: (action) => {
+      set(s => {
+        switch (action) {
+          case 'close':
+            s.activeDialog = null;
+            break;
+          case 'accept-quest':
+            if (!s.flags[QUEST_ACCEPT]) {
+              s.flags[QUEST_ACCEPT] = true;
+              s.messages.push('📜 接受任務：調查幽影迷宮');
+            }
+            s.activeDialog = null;
+            break;
+          case 'claim-reward':
+            if (s.flags[QUEST_DONE] && !s.flags[QUEST_REWARD]) {
+              s.player.gold += 500;
+              s.flags[QUEST_REWARD] = true;
+              s.messages.push('💰 獲得獎勵 500G！');
+            }
+            s.activeDialog = null;
+            break;
+        }
+      });
+      if (action === 'accept-quest' || action === 'claim-reward') {
+        get().saveGame();
+      }
     },
   })),
 );
