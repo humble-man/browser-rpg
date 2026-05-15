@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type {
+  ActiveDialog,
   BattleState,
   Monster,
   Player,
@@ -61,6 +62,7 @@ export interface GameStore {
   shopOpen: boolean;
   hasSave: boolean;
   bossDefeated: boolean;
+  activeDialog: ActiveDialog | null;
 
   // lifecycle
   newGame: (name: string) => void;
@@ -94,6 +96,9 @@ export interface GameStore {
 
   // inventory (outside battle)
   useItem: (itemId: string) => void;
+
+  // dialog
+  advanceDialog: () => void;
 }
 
 function pushLog(b: BattleState, line: string) {
@@ -111,6 +116,7 @@ export const useGame = create<GameStore>()(
     shopOpen: false,
     hasSave: !!localStorage.getItem(SAVE_KEY),
     bossDefeated: false,
+    activeDialog: null,
 
     refreshHasSave: () => {
       set(s => {
@@ -274,6 +280,13 @@ export const useGame = create<GameStore>()(
       if (movedTile.type === 'boss') {
         if (!get().bossDefeated) {
           get().startBattle('dragon', true);
+        }
+        return;
+      }
+      if (movedTile.type === 'npc') {
+        const npc = MAPS[mapId].npcs?.[`${nx},${ny}`];
+        if (npc && npc.lines.length > 0) {
+          set(s => { s.activeDialog = { npc, lineIndex: 0 }; });
         }
         return;
       }
@@ -619,6 +632,16 @@ export const useGame = create<GameStore>()(
         if (!desc) return;
         removeItem(s.player, itemId, 1);
         s.messages.push(`🧪 使用「${item.name}」 — ${desc}`);
+      });
+    },
+
+    advanceDialog: () => {
+      set(s => {
+        if (!s.activeDialog) return;
+        s.activeDialog.lineIndex += 1;
+        if (s.activeDialog.lineIndex >= s.activeDialog.npc.lines.length) {
+          s.activeDialog = null;
+        }
       });
     },
   })),

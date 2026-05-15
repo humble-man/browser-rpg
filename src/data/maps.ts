@@ -20,6 +20,7 @@ const GLYPH: Record<string, TileType> = {
   'B': 'boss',
   'f': 'floor',
   'T': 'treasure',
+  'N': 'npc',
 };
 
 function parse(rows: string[]): MapTile[][] {
@@ -31,11 +32,11 @@ function parse(rows: string[]): MapTile[][] {
 const VILLAGE_ROWS = [
   '############',
   '#..........#',
-  '#.....S....#',
+  '#.N...S....#',
   '#..........#',
-  '#..........#',
+  '#.......N..#',
   '#...I......#',
-  '#..........#',
+  '#..N.......#',
   '#......T...#',
   '#.........D#',
   '############',
@@ -66,6 +67,35 @@ export const MAPS: Record<MapId, GameMap> = {
     spawn: { x: 5, y: 4 },
     treasures: {
       '7,7': { itemId: 'iron-sword', count: 1 },
+    },
+    npcs: {
+      '2,2': {
+        name: '村長',
+        emoji: '👴',
+        lines: [
+          { speaker: '村長', text: '歡迎來到碧楓村，年輕的冒險者。' },
+          { speaker: '村長', text: '最近村南的幽影迷宮鬧出怪事⋯野獸增加、夜裡有奇怪聲響。' },
+          { speaker: '村長', text: '若你願意幫忙調查，全村都會感謝你。' },
+        ],
+      },
+      '8,4': {
+        name: '神秘冒險者',
+        emoji: '🧙‍♂️',
+        lines: [
+          { speaker: '神秘冒險者', text: '⋯你也是來挑戰迷宮的？' },
+          { speaker: '神秘冒險者', text: '迷宮深處有頭幽魂龍，比一般怪強得多。' },
+          { speaker: '神秘冒險者', text: '沒等級五以上、沒鐵劍皮甲，最好別硬上。' },
+          { speaker: '神秘冒險者', text: '⋯祝你好運。' },
+        ],
+      },
+      '3,6': {
+        name: '旅店老闆娘',
+        emoji: '👩‍🍳',
+        lines: [
+          { speaker: '旅店老闆娘', text: '累了嗎？旅館一晚 10 金幣，包你 HP / MP 全滿。' },
+          { speaker: '旅店老闆娘', text: '對了，按 ESC 可以打開系統選單，存檔別忘了。' },
+        ],
+      },
     },
   },
   dungeon: {

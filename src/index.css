@@ -374,6 +374,10 @@ input, textarea {
   box-shadow: 0 0 8px rgba(212, 166, 76, 0.4);
 }
 
+.tile-npc {
+  background: linear-gradient(135deg, #4a8a8c, #2a5a5c);
+}
+
 @keyframes pulse-boss {
   0%, 100% { box-shadow: 0 0 8px rgba(192, 42, 74, 0.5); }
   50% { box-shadow: 0 0 24px rgba(255, 100, 130, 0.9); }
@@ -830,6 +834,48 @@ input, textarea {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* === Dialog Modal === */
+.dialog-modal {
+  max-width: 480px;
+}
+
+.dialog-speaker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--purple);
+}
+
+.dialog-emoji {
+  font-size: 32px;
+}
+
+.dialog-name {
+  color: var(--gold-bright);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+}
+
+.dialog-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #e8dcfc;
+  min-height: 60px;
+  white-space: pre-line;
+  margin-bottom: 12px;
+}
+
+.dialog-hint {
+  font-size: 11px;
+  color: #8074a4;
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 0.05em;
 }
 
 /* === Items Modal === */

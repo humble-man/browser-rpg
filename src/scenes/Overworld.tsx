@@ -5,6 +5,7 @@ import { MenuButton } from '../ui/MenuButton';
 import { HpBar } from '../ui/HpBar';
 import { EquipModal } from '../ui/EquipModal';
 import { ItemsModal } from '../ui/ItemsModal';
+import { DialogModal } from '../ui/DialogModal';
 import { Shop } from './Shop';
 import { xpForNextLevel } from '../core/store';
 
@@ -19,6 +20,7 @@ const TILE_GLYPH: Record<string, string> = {
   boss: '🐉',
   sign: '📜',
   treasure: '📦',
+  npc: '👤',
 };
 
 export function Overworld() {
@@ -27,6 +29,7 @@ export function Overworld() {
   const movePlayer = useGame(s => s.movePlayer);
   const messages = useGame(s => s.messages);
   const shopOpen = useGame(s => s.shopOpen);
+  const activeDialog = useGame(s => s.activeDialog);
   const saveGame = useGame(s => s.saveGame);
   const resetToTitle = useGame(s => s.resetToTitle);
   const exportSave = useGame(s => s.exportSave);
@@ -43,6 +46,7 @@ export function Overworld() {
       if (showMenu) return;
       if (showEquip) return;
       if (showItems) return;
+      if (activeDialog) return;
       const k = e.key.toLowerCase();
       if (k === 'arrowup' || k === 'w') { movePlayer(0, -1); e.preventDefault(); }
       else if (k === 'arrowdown' || k === 's') { movePlayer(0, 1); e.preventDefault(); }
@@ -52,7 +56,7 @@ export function Overworld() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [movePlayer, shopOpen, showMenu, showEquip, showItems]);
+  }, [movePlayer, shopOpen, showMenu, showEquip, showItems, activeDialog]);
 
   return (
     <div className="overworld-scene">
@@ -82,6 +86,10 @@ export function Overworld() {
               if (tile.type === 'treasure') {
                 const opened = flags[`treasure-${player.position.mapId}-${x}-${y}`];
                 glyph = opened ? '📭' : '📦';
+              }
+              if (tile.type === 'npc') {
+                const npc = map.npcs?.[`${x},${y}`];
+                glyph = npc?.emoji ?? '👤';
               }
               return (
                 <div
@@ -143,6 +151,7 @@ export function Overworld() {
 
       {showEquip && <EquipModal onClose={() => setShowEquip(false)} />}
       {showItems && <ItemsModal onClose={() => setShowItems(false)} />}
+      <DialogModal />
 
       {showMenu && (
         <div className="modal-backdrop" onClick={() => setShowMenu(false)}>
