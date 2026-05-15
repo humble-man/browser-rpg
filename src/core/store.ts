@@ -156,6 +156,47 @@ function pickElderLines(flags: Record<string, boolean>): DialogLine[] {
   return ELDER_INITIAL;
 }
 
+const ADVENTURER_DEFAULT: DialogLine[] = [
+  { speaker: '神秘冒險者', text: '⋯你也是來挑戰迷宮的？' },
+  { speaker: '神秘冒險者', text: '迷宮深處有頭幽魂龍，比一般怪強得多。' },
+  { speaker: '神秘冒險者', text: '沒等級五以上、沒鐵劍皮甲，最好別硬上。' },
+  { speaker: '神秘冒險者', text: '⋯祝你好運。' },
+];
+
+const ADVENTURER_MINIBOSS_BEATEN: DialogLine[] = [
+  { speaker: '神秘冒險者', text: '迷霧獵手⋯你做到了？真厲害。' },
+  { speaker: '神秘冒險者', text: '再深處就是龍了，多多保重。' },
+];
+
+const ADVENTURER_BOSS_BEATEN: DialogLine[] = [
+  { speaker: '神秘冒險者', text: '⋯你居然連幽魂龍都打倒了。' },
+  { speaker: '神秘冒險者', text: '我比不上你。碧楓村的英雄。' },
+];
+
+function pickAdventurerLines(
+  flags: Record<string, boolean>,
+  bossDefeated: boolean,
+): DialogLine[] {
+  if (bossDefeated) return ADVENTURER_BOSS_BEATEN;
+  if (flags['mini-boss-defeated']) return ADVENTURER_MINIBOSS_BEATEN;
+  return ADVENTURER_DEFAULT;
+}
+
+const INNKEEPER_DEFAULT: DialogLine[] = [
+  { speaker: '旅店老闆娘', text: '累了嗎？旅館一晚 10 金幣，包你 HP / MP 全滿。' },
+  { speaker: '旅店老闆娘', text: '對了，按 ESC 可以打開系統選單，存檔別忘了。' },
+];
+
+const INNKEEPER_POST_REWARD: DialogLine[] = [
+  { speaker: '旅店老闆娘', text: '村長今天可開心了，多虧你呢。' },
+  { speaker: '旅店老闆娘', text: '旅館一晚 10 金幣，要不要住一晚？' },
+];
+
+function pickInnkeeperLines(flags: Record<string, boolean>): DialogLine[] {
+  if (flags[QUEST_REWARD]) return INNKEEPER_POST_REWARD;
+  return INNKEEPER_DEFAULT;
+}
+
 export const useGame = create<GameStore>()(
   immer((set, get) => ({
     scene: 'title',
@@ -343,10 +384,12 @@ export const useGame = create<GameStore>()(
       if (movedTile.type === 'npc') {
         const npc = MAPS[mapId].npcs?.[`${nx},${ny}`];
         if (npc) {
-          // Village elder gets state-driven lines based on quest flags
+          // State-driven dialog lines for village NPCs
           let lines = npc.lines;
-          if (mapId === 'village' && nx === 2 && ny === 2) {
-            lines = pickElderLines(get().flags);
+          if (mapId === 'village') {
+            if (nx === 2 && ny === 2) lines = pickElderLines(get().flags);
+            else if (nx === 8 && ny === 4) lines = pickAdventurerLines(get().flags, get().bossDefeated);
+            else if (nx === 3 && ny === 6) lines = pickInnkeeperLines(get().flags);
           }
           if (lines.length > 0) {
             set(s => { s.activeDialog = { npc: { ...npc, lines }, lineIndex: 0 }; });
