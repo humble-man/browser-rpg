@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/browser-rpg/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -31,9 +32,8 @@ export default defineConfig({
       },
     }),
   ],
-  base: './',
   server: {
     host: '127.0.0.1',
     port: 5173,
   },
-});
+}));
