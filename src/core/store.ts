@@ -327,6 +327,12 @@ export const useGame = create<GameStore>()(
         }
         return;
       }
+      if (movedTile.type === 'mini-boss') {
+        if (!get().flags['mini-boss-defeated']) {
+          get().startBattle('mistHunter', true);
+        }
+        return;
+      }
       if (movedTile.type === 'npc') {
         const npc = MAPS[mapId].npcs?.[`${nx},${ny}`];
         if (npc) {
@@ -518,8 +524,12 @@ export const useGame = create<GameStore>()(
           }
           s.battle.phase = 'won';
           if (s.battle.isBoss) {
-            s.bossDefeated = true;
-            s.flags[QUEST_DONE] = true;
+            if (s.battle.enemy.id === 'dragon') {
+              s.bossDefeated = true;
+              s.flags[QUEST_DONE] = true;
+            } else if (s.battle.enemy.id === 'mistHunter') {
+              s.flags['mini-boss-defeated'] = true;
+            }
           }
         });
         get().saveGame();

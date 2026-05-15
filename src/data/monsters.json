@@ -59,6 +59,21 @@
     "goldReward": 28,
     "drops": [{ "itemId": "antidote", "chance": 0.3 }]
   },
+  "mistHunter": {
+    "id": "mistHunter",
+    "name": "迷霧獵手",
+    "emoji": "👹",
+    "hp": 80,
+    "maxHp": 80,
+    "mp": 0,
+    "maxMp": 0,
+    "atk": 14,
+    "def": 7,
+    "spd": 6,
+    "xpReward": 80,
+    "goldReward": 50,
+    "drops": [{ "itemId": "leather-armor", "chance": 1.0 }]
+  },
   "dragon": {
     "id": "dragon",
     "name": "迷宮頭目・幽魂龍",

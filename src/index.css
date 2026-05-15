@@ -378,6 +378,11 @@ input, textarea {
   background: linear-gradient(135deg, #4a8a8c, #2a5a5c);
 }
 
+.tile-mini-boss {
+  background: linear-gradient(135deg, #8a4040, #5a2020);
+  box-shadow: 0 0 8px rgba(212, 76, 76, 0.4);
+}
+
 @keyframes pulse-boss {
   0%, 100% { box-shadow: 0 0 8px rgba(192, 42, 74, 0.5); }
   50% { box-shadow: 0 0 24px rgba(255, 100, 130, 0.9); }
