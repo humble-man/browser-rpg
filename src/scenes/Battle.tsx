@@ -4,6 +4,7 @@ import { HpBar } from '../ui/HpBar';
 import { MenuButton } from '../ui/MenuButton';
 import { LevelUpOverlay } from '../ui/LevelUpOverlay';
 import { getItem } from '../systems/inventory';
+import { playSE } from '../core/audio';
 
 type Menu = 'main' | 'skill' | 'item';
 
@@ -43,6 +44,12 @@ export function Battle() {
       setMenu('main');
     }
   }, [battle?.phase, advanceTurn, enemyAct, battle]);
+
+  // Victory / defeat SE
+  useEffect(() => {
+    if (battle?.phase === 'won') playSE('victory');
+    else if (battle?.phase === 'lost') playSE('defeat');
+  }, [battle?.phase]);
 
   if (!battle) return null;
 

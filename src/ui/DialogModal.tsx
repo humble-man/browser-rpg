@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGame } from '../core/store';
 import { MenuButton } from './MenuButton';
+import { playSE } from '../core/audio';
 
 export function DialogModal() {
   const activeDialog = useGame(s => s.activeDialog);
@@ -43,7 +44,7 @@ export function DialogModal() {
                 key={i}
                 fullWidth
                 variant={c.action === 'close' ? 'secondary' : 'primary'}
-                onClick={() => handleChoice(c.action)}
+                onClick={() => { playSE('menu'); handleChoice(c.action); }}
               >
                 {c.text}
               </MenuButton>
