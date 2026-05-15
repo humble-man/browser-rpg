@@ -75,7 +75,14 @@ export const MAPS: Record<MapId, GameMap> = {
         lines: [
           { speaker: '村長', text: '歡迎來到碧楓村，年輕的冒險者。' },
           { speaker: '村長', text: '最近村南的幽影迷宮鬧出怪事⋯野獸增加、夜裡有奇怪聲響。' },
-          { speaker: '村長', text: '若你願意幫忙調查，全村都會感謝你。' },
+          {
+            speaker: '村長',
+            text: '若你願意幫忙調查，全村都會感謝你。',
+            choices: [
+              { text: '⚔️ 接受任務', action: 'accept-quest' },
+              { text: '之後再說', action: 'close' },
+            ],
+          },
         ],
       },
       '8,4': {

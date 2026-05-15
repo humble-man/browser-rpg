@@ -878,6 +878,12 @@ input, textarea {
   letter-spacing: 0.05em;
 }
 
+.dialog-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 /* === Items Modal === */
 .items-modal { max-width: 480px; }
 
