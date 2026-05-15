@@ -96,7 +96,8 @@ export type TileType =
   | 'sign'
   | 'floor'
   | 'treasure'
-  | 'npc';
+  | 'npc'
+  | 'mini-boss';
 
 export interface MapTile {
   type: TileType;

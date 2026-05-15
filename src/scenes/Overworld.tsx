@@ -21,6 +21,7 @@ const TILE_GLYPH: Record<string, string> = {
   sign: '📜',
   treasure: '📦',
   npc: '👤',
+  'mini-boss': '⚔️',
 };
 
 export function Overworld() {
@@ -90,6 +91,9 @@ export function Overworld() {
               if (tile.type === 'npc') {
                 const npc = map.npcs?.[`${x},${y}`];
                 glyph = npc?.emoji ?? '👤';
+              }
+              if (tile.type === 'mini-boss') {
+                glyph = flags['mini-boss-defeated'] ? '🗡️' : '⚔️';
               }
               return (
                 <div

@@ -21,6 +21,7 @@ const GLYPH: Record<string, TileType> = {
   'f': 'floor',
   'T': 'treasure',
   'N': 'npc',
+  'M': 'mini-boss',
 };
 
 function parse(rows: string[]): MapTile[][] {
@@ -50,7 +51,7 @@ const DUNGEON_ROWS = [
   '#.f.f....f.f..#',
   '#.f.fff..f.T..#',
   '#.f.....f.f...#',
-  '#.fffffff.f...#',
+  '#.fffffMf.f...#',
   '#..........fT.#',
   '#.fffffff.f...#',
   '#...........B.#',
