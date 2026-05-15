@@ -18,10 +18,16 @@ export function applyXp(player: Player, xpGain: number): {
   to: number;
   hpGained: number;
   mpGained: number;
+  atkGained: number;
+  defGained: number;
+  spdGained: number;
 } {
   const from = player.level;
   let hpGained = 0;
   let mpGained = 0;
+  let atkGained = 0;
+  let defGained = 0;
+  let spdGained = 0;
 
   player.xp += xpGain;
 
@@ -43,7 +49,19 @@ export function applyXp(player: Player, xpGain: number): {
     player.mp = player.maxMp;
     hpGained += dHp;
     mpGained += dMp;
+    atkGained += dAtk;
+    defGained += dDef;
+    spdGained += dSpd;
   }
 
-  return { leveledUp: player.level > from, from, to: player.level, hpGained, mpGained };
+  return {
+    leveledUp: player.level > from,
+    from,
+    to: player.level,
+    hpGained,
+    mpGained,
+    atkGained,
+    defGained,
+    spdGained,
+  };
 }

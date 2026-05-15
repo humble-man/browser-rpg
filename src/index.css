@@ -841,6 +841,78 @@ input, textarea {
   gap: 8px;
 }
 
+/* === Level-Up Overlay === */
+.levelup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.7);
+  display: grid;
+  place-items: center;
+  animation:
+    levelup-fadein 0.3s ease-out,
+    levelup-fadeout 0.3s ease-in 1.7s forwards;
+}
+
+.levelup-panel {
+  background: linear-gradient(135deg, #2a1a4d, #1a1230);
+  border: 2px solid var(--gold-bright);
+  border-radius: 12px;
+  padding: 24px 32px;
+  min-width: 260px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(240, 200, 112, 0.4);
+  animation: levelup-zoom 0.3s ease-out;
+}
+
+.levelup-banner {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gold-bright);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  text-shadow: 0 0 12px rgba(240, 200, 112, 0.6);
+}
+
+.levelup-level {
+  font-size: 18px;
+  color: #e8dcfc;
+  margin-bottom: 16px;
+}
+
+.levelup-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.levelup-stat {
+  font-size: 15px;
+  color: #66f088;
+  font-family: monospace;
+}
+
+.levelup-hint {
+  font-size: 11px;
+  color: #8074a4;
+  letter-spacing: 0.05em;
+}
+
+@keyframes levelup-fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes levelup-fadeout {
+  to { opacity: 0; }
+}
+
+@keyframes levelup-zoom {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 /* === Dialog Modal === */
 .dialog-modal {
   max-width: 480px;

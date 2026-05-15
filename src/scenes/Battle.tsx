@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useGame, SKILLS } from '../core/store';
 import { HpBar } from '../ui/HpBar';
 import { MenuButton } from '../ui/MenuButton';
+import { LevelUpOverlay } from '../ui/LevelUpOverlay';
 import { getItem } from '../systems/inventory';
 
 type Menu = 'main' | 'skill' | 'item';
@@ -152,6 +153,7 @@ export function Battle() {
           </div>
         )}
       </div>
+      <LevelUpOverlay />
     </div>
   );
 }
