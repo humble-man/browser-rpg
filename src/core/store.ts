@@ -6,6 +6,7 @@ import type {
   DialogAction,
   DialogLine,
   Monster,
+  PendingLevelUp,
   Player,
   SceneId,
   Skill,
@@ -65,6 +66,7 @@ export interface GameStore {
   hasSave: boolean;
   bossDefeated: boolean;
   activeDialog: ActiveDialog | null;
+  pendingLevelUp: PendingLevelUp | null;
 
   // lifecycle
   newGame: (name: string) => void;
@@ -102,6 +104,9 @@ export interface GameStore {
   // dialog
   advanceDialog: () => void;
   handleDialogChoice: (action: DialogAction) => void;
+
+  // level-up celebration
+  clearLevelUp: () => void;
 }
 
 function pushLog(b: BattleState, line: string) {
@@ -161,6 +166,7 @@ export const useGame = create<GameStore>()(
     hasSave: !!localStorage.getItem(SAVE_KEY),
     bossDefeated: false,
     activeDialog: null,
+    pendingLevelUp: null,
 
     refreshHasSave: () => {
       set(s => {
@@ -511,6 +517,15 @@ export const useGame = create<GameStore>()(
           pushLog(s.battle, `🎉 擊敗 ${s.battle.enemy.name}！+${xp} XP，+${gold} G`);
           if (result.leveledUp) {
             pushLog(s.battle, `⬆️ 升等！Lv ${result.from} → Lv ${result.to}（+${result.hpGained} HP / +${result.mpGained} MP）`);
+            s.pendingLevelUp = {
+              from: result.from,
+              to: result.to,
+              hpGained: result.hpGained,
+              mpGained: result.mpGained,
+              atkGained: result.atkGained,
+              defGained: result.defGained,
+              spdGained: result.spdGained,
+            };
           }
           // Drops
           if (s.battle.enemy.drops) {
@@ -707,6 +722,10 @@ export const useGame = create<GameStore>()(
           s.activeDialog = null;
         }
       });
+    },
+
+    clearLevelUp: () => {
+      set(s => { s.pendingLevelUp = null; });
     },
 
     handleDialogChoice: (action) => {

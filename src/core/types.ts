@@ -133,6 +133,16 @@ export interface ActiveDialog {
   lineIndex: number;
 }
 
+export interface PendingLevelUp {
+  from: number;
+  to: number;
+  hpGained: number;
+  mpGained: number;
+  atkGained: number;
+  defGained: number;
+  spdGained: number;
+}
+
 export interface GameMap {
   id: MapId;
   name: string;
