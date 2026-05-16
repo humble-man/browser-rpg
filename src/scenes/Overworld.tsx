@@ -6,6 +6,7 @@ import { HpBar } from '../ui/HpBar';
 import { EquipModal } from '../ui/EquipModal';
 import { ItemsModal } from '../ui/ItemsModal';
 import { DialogModal } from '../ui/DialogModal';
+import { GameCompleteOverlay } from '../ui/GameCompleteOverlay';
 import { Shop } from './Shop';
 import { xpForNextLevel } from '../core/store';
 import { isMuted, setMuted, playSE } from '../core/audio';
@@ -158,6 +159,7 @@ export function Overworld() {
       {showEquip && <EquipModal onClose={() => setShowEquip(false)} />}
       {showItems && <ItemsModal onClose={() => setShowItems(false)} />}
       <DialogModal />
+      <GameCompleteOverlay />
 
       {showMenu && (
         <div className="modal-backdrop" onClick={() => setShowMenu(false)}>
