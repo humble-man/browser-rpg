@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGame, SKILLS } from '../core/store';
 import { HpBar } from '../ui/HpBar';
 import { MenuButton } from '../ui/MenuButton';
@@ -7,6 +7,14 @@ import { getItem } from '../systems/inventory';
 import { playSE } from '../core/audio';
 
 type Menu = 'main' | 'skill' | 'item';
+
+interface FloatingDmg {
+  key: number;
+  target: 'player' | 'enemy';
+  amount: number;
+  crit?: boolean;
+  kind: 'damage' | 'heal';
+}
 
 export function Battle() {
   const player = useGame(s => s.player);
@@ -18,6 +26,8 @@ export function Battle() {
   const [menu, setMenu] = useState<Menu>('main');
   const [shakeEnemy, setShakeEnemy] = useState(false);
   const [shakePlayer, setShakePlayer] = useState(false);
+  const [floatingDmg, setFloatingDmg] = useState<FloatingDmg | null>(null);
+  const dmgKeyRef = useRef(0);
 
   // Drive phase transitions: animating -> advanceTurn, enemy -> enemyAct.
   useEffect(() => {
@@ -51,6 +61,21 @@ export function Battle() {
     else if (battle?.phase === 'lost') playSE('defeat');
   }, [battle?.phase]);
 
+  // Floating damage number on lastDamage change
+  useEffect(() => {
+    if (!battle?.lastDamage) return;
+    dmgKeyRef.current += 1;
+    setFloatingDmg({
+      key: dmgKeyRef.current,
+      target: battle.lastDamage.target,
+      amount: battle.lastDamage.amount,
+      crit: battle.lastDamage.crit,
+      kind: battle.lastDamage.kind ?? 'damage',
+    });
+    const t = setTimeout(() => setFloatingDmg(null), 1000);
+    return () => clearTimeout(t);
+  }, [battle?.lastDamage]);
+
   if (!battle) return null;
 
   const { enemy, enemyCurrentHp, phase, log, isBoss } = battle;
@@ -64,9 +89,14 @@ export function Battle() {
           <div className="combatant-portrait">{enemy.emoji}</div>
           <div className="combatant-name">{enemy.name}</div>
           <HpBar current={enemyCurrentHp} max={enemy.maxHp} variant="hp" />
-          {battle.lastDamage?.target === 'enemy' && shakeEnemy && (
-            <div className={`damage-pop${battle.lastDamage.crit ? ' crit' : ''}`}>
-              -{battle.lastDamage.amount}
+          {floatingDmg && floatingDmg.target === 'enemy' && (
+            <div
+              key={floatingDmg.key}
+              className={`damage-number${floatingDmg.crit ? ' crit' : ''}${floatingDmg.kind === 'heal' ? ' heal' : ''}`}
+            >
+              {floatingDmg.kind === 'heal'
+                ? `+${floatingDmg.amount}`
+                : `${floatingDmg.amount}${floatingDmg.crit ? '!' : ''}`}
             </div>
           )}
         </div>
@@ -77,9 +107,14 @@ export function Battle() {
           <div className="combatant-name">{player.name} Lv.{player.level}</div>
           <HpBar label="HP" current={player.hp} max={player.maxHp} variant="hp" />
           <HpBar label="MP" current={player.mp} max={player.maxMp} variant="mp" />
-          {battle.lastDamage?.target === 'player' && shakePlayer && (
-            <div className={`damage-pop${battle.lastDamage.crit ? ' crit' : ''}`}>
-              -{battle.lastDamage.amount}
+          {floatingDmg && floatingDmg.target === 'player' && (
+            <div
+              key={floatingDmg.key}
+              className={`damage-number${floatingDmg.crit ? ' crit' : ''}${floatingDmg.kind === 'heal' ? ' heal' : ''}`}
+            >
+              {floatingDmg.kind === 'heal'
+                ? `+${floatingDmg.amount}`
+                : `${floatingDmg.amount}${floatingDmg.crit ? '!' : ''}`}
             </div>
           )}
         </div>
