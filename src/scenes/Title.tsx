@@ -2,27 +2,35 @@ import { useState } from 'react';
 import { useGame } from '../core/store';
 import { MenuButton } from '../ui/MenuButton';
 import { clearSave } from '../core/save';
+import { isMuted, setMuted, playSE } from '../core/audio';
 
 export function Title() {
   const [name, setName] = useState('勇者');
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
+  const [mutedState, setMutedState] = useState(isMuted());
   const newGame = useGame(s => s.newGame);
   const loadGame = useGame(s => s.loadGame);
   const hasSave = useGame(s => s.hasSave);
   const refreshHasSave = useGame(s => s.refreshHasSave);
   const importSave = useGame(s => s.importSave);
 
+  const toggleMute = () => {
+    const next = !mutedState;
+    setMuted(next);
+    setMutedState(next);
+    if (!next) playSE('menu');
+  };
+
   return (
     <div className="title-scene">
       <div className="title-card">
-        <h1 className="title-main">
-          幽影迷宮
-          <span className="title-sub">— Browser RPG</span>
-        </h1>
-        <p className="title-tagline">
-          ✦ 一款打開瀏覽器即玩的回合制冒險 ✦
-        </p>
+        <div className="title-banner">
+          <span className="title-banner-deco">⚔️</span>
+          <h1 className="title-main">幽影迷宮</h1>
+          <span className="title-banner-deco">⚔️</span>
+        </div>
+        <p className="title-subtitle">─ 碧楓村的傳說 ─</p>
 
         <div className="title-section">
           <label className="title-label">
@@ -95,6 +103,28 @@ export function Title() {
         <p className="title-controls">
           🎮 鍵盤：方向鍵 / WASD 移動 · 滑鼠：點擊按鈕
         </p>
+
+        <div className="title-audio-toggle">
+          <MenuButton
+            fullWidth
+            variant={mutedState ? 'secondary' : 'primary'}
+            onClick={toggleMute}
+          >
+            {mutedState ? '🔇 已靜音（點擊開聲）' : '🔊 聲音開啟（點擊靜音）'}
+          </MenuButton>
+        </div>
+
+        <footer className="title-footer">
+          <span>v{__APP_VERSION__}</span>
+          <span className="title-footer-sep"> · </span>
+          <a
+            href="https://github.com/humble-man/browser-rpg"
+            target="_blank"
+            rel="noopener"
+          >
+            GitHub
+          </a>
+        </footer>
       </div>
     </div>
   );
