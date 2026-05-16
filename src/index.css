@@ -114,6 +114,52 @@ input, textarea {
   letter-spacing: 0.05em;
 }
 
+.title-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.title-banner-deco {
+  font-size: 28px;
+  opacity: 0.7;
+}
+
+.title-subtitle {
+  text-align: center;
+  color: #b8a8d0;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  margin: 0 0 24px;
+}
+
+.title-audio-toggle {
+  margin-top: 18px;
+}
+
+.title-footer {
+  margin-top: 24px;
+  color: #6f6790;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.title-footer a {
+  color: var(--gold-bright);
+  text-decoration: none;
+}
+
+.title-footer a:hover {
+  text-decoration: underline;
+}
+
+.title-footer-sep {
+  color: #4a4360;
+}
+
 .title-section { margin-bottom: 16px; }
 
 .title-label {
