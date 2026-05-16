@@ -504,7 +504,9 @@ export const useGame = create<GameStore>()(
               const before = s.player.hp;
               s.player.hp = Math.min(s.player.maxHp, s.player.hp + skill.power);
               if (s.battle) {
-                pushLog(s.battle, `✨ ${s.player.name} 施放 ${skill.name}，回復 ${s.player.hp - before} HP`);
+                const gained = s.player.hp - before;
+                pushLog(s.battle, `✨ ${s.player.name} 施放 ${skill.name}，回復 ${gained} HP`);
+                s.battle.lastDamage = { target: 'player', amount: gained, kind: 'heal' };
                 s.battle.phase = 'animating';
               }
             });
@@ -516,12 +518,17 @@ export const useGame = create<GameStore>()(
           if (countOf(state.player, itemId) <= 0) return;
           playSE('heal');
           set(s => {
+            const beforeHp = s.player.hp;
             const desc = applyConsumable(s.player, itemId);
             if (!desc) return;
             removeItem(s.player, itemId, 1);
             const item = getItem(itemId);
             if (s.battle && item) {
               pushLog(s.battle, `🧪 使用「${item.name}」 — ${desc}`);
+              const hpGain = s.player.hp - beforeHp;
+              if (hpGain > 0) {
+                s.battle.lastDamage = { target: 'player', amount: hpGain, kind: 'heal' };
+              }
               s.battle.phase = 'animating';
             }
           });
@@ -647,8 +654,9 @@ export const useGame = create<GameStore>()(
                 if (slot.count <= 0) ai.items = ai.items.filter(i => i.itemId !== intent.itemId);
               }
             }
-            pushLog(s.battle, `💚 ${s.battle.enemy.name} 使用${item.name}，回復 ${s.battle.enemyCurrentHp - before} HP`);
-            s.battle.lastDamage = undefined;
+            const gained = s.battle.enemyCurrentHp - before;
+            pushLog(s.battle, `💚 ${s.battle.enemy.name} 使用${item.name}，回復 ${gained} HP`);
+            s.battle.lastDamage = { target: 'enemy', amount: gained, kind: 'heal' };
             s.battle.phase = 'animating';
           });
         }

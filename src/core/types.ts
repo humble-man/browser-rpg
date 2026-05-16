@@ -169,5 +169,5 @@ export interface BattleState {
   isBoss: boolean;
   actionQueue: Actor[];
   queueIndex: number;
-  lastDamage?: { target: 'player' | 'enemy'; amount: number; crit?: boolean };
+  lastDamage?: { target: 'player' | 'enemy'; amount: number; crit?: boolean; kind?: 'damage' | 'heal' };
 }
