@@ -68,6 +68,7 @@ export interface GameStore {
   bossDefeated: boolean;
   activeDialog: ActiveDialog | null;
   pendingLevelUp: PendingLevelUp | null;
+  pendingGameComplete: boolean | null;
 
   // lifecycle
   newGame: (name: string) => void;
@@ -108,6 +109,9 @@ export interface GameStore {
 
   // level-up celebration
   clearLevelUp: () => void;
+
+  // game completion celebration
+  clearGameComplete: () => void;
 }
 
 function pushLog(b: BattleState, line: string) {
@@ -209,6 +213,7 @@ export const useGame = create<GameStore>()(
     bossDefeated: false,
     activeDialog: null,
     pendingLevelUp: null,
+    pendingGameComplete: null,
 
     refreshHasSave: () => {
       set(s => {
@@ -787,6 +792,10 @@ export const useGame = create<GameStore>()(
       set(s => { s.pendingLevelUp = null; });
     },
 
+    clearGameComplete: () => {
+      set(s => { s.pendingGameComplete = null; });
+    },
+
     handleDialogChoice: (action) => {
       set(s => {
         switch (action) {
@@ -805,6 +814,10 @@ export const useGame = create<GameStore>()(
               s.player.gold += 500;
               s.flags[QUEST_REWARD] = true;
               s.messages.push('💰 獲得獎勵 500G！');
+              if (!s.flags['game-completion-shown']) {
+                s.flags['game-completion-shown'] = true;
+                s.pendingGameComplete = true;
+              }
             }
             s.activeDialog = null;
             break;

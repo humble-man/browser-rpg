@@ -847,6 +847,63 @@ input, textarea {
   gap: 8px;
 }
 
+/* === Game Complete Overlay === */
+.game-complete-backdrop {
+  z-index: 350;
+}
+
+.game-complete-panel {
+  max-width: 420px;
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 0 60px rgba(240, 200, 112, 0.4);
+  animation: gc-zoom 0.4s ease-out;
+}
+
+.gc-banner {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--gold-bright);
+  letter-spacing: 0.1em;
+  margin: 4px 0 16px;
+  text-shadow: 0 0 12px rgba(240, 200, 112, 0.7);
+}
+
+.gc-stats {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--purple);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gc-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #d8ccea;
+}
+
+.gc-stat-row strong {
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+
+.gc-thank {
+  text-align: center;
+  color: #e8dcfc;
+  font-size: 14px;
+  margin: 8px 0 12px;
+}
+
+@keyframes gc-zoom {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 /* === Level-Up Overlay === */
 .levelup-backdrop {
   position: fixed;
