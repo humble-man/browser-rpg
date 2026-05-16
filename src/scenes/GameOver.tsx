@@ -1,11 +1,17 @@
+import { useEffect } from 'react';
 import { useGame } from '../core/store';
 import { MenuButton } from '../ui/MenuButton';
+import { stopBgm } from '../core/audio';
 
 export function GameOver() {
   const player = useGame(s => s.player);
   const loadGame = useGame(s => s.loadGame);
   const resetToTitle = useGame(s => s.resetToTitle);
   const hasSave = useGame(s => s.hasSave);
+
+  useEffect(() => {
+    stopBgm();
+  }, []);
 
   return (
     <div className="gameover-scene">

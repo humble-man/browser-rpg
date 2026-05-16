@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGame } from '../core/store';
 import { MenuButton } from '../ui/MenuButton';
 import { clearSave } from '../core/save';
-import { isMuted, setMuted, playSE } from '../core/audio';
+import { isMuted, setMuted, playSE, stopBgm } from '../core/audio';
 
 export function Title() {
   const [name, setName] = useState('勇者');
@@ -21,6 +21,10 @@ export function Title() {
     setMutedState(next);
     if (!next) playSE('menu');
   };
+
+  useEffect(() => {
+    stopBgm();
+  }, []);
 
   return (
     <div className="title-scene">
