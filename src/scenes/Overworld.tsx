@@ -9,7 +9,7 @@ import { DialogModal } from '../ui/DialogModal';
 import { GameCompleteOverlay } from '../ui/GameCompleteOverlay';
 import { Shop } from './Shop';
 import { xpForNextLevel } from '../core/store';
-import { isMuted, setMuted, playSE } from '../core/audio';
+import { isMuted, setMuted, playSE, startBgm } from '../core/audio';
 
 const TILE_GLYPH: Record<string, string> = {
   grass: '·',
@@ -43,6 +43,10 @@ export function Overworld() {
 
   const map = MAPS[player.position.mapId];
   const xpNext = useMemo(() => xpForNextLevel(player.level), [player.level]);
+
+  useEffect(() => {
+    startBgm('overworld');
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
