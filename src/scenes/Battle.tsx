@@ -16,6 +16,13 @@ interface FloatingDmg {
   kind: 'damage' | 'heal';
 }
 
+interface HitFlash {
+  key: number;
+  target: 'player' | 'enemy';
+  kind: 'damage' | 'heal';
+  crit: boolean;
+}
+
 export function Battle() {
   const player = useGame(s => s.player);
   const battle = useGame(s => s.battle);
@@ -27,6 +34,8 @@ export function Battle() {
   const [shakeEnemy, setShakeEnemy] = useState(false);
   const [shakePlayer, setShakePlayer] = useState(false);
   const [floatingDmg, setFloatingDmg] = useState<FloatingDmg | null>(null);
+  const [hitFlash, setHitFlash] = useState<HitFlash | null>(null);
+  const [lungeAttacker, setLungeAttacker] = useState<'player' | 'enemy' | null>(null);
   const dmgKeyRef = useRef(0);
 
   // Drive phase transitions: animating -> advanceTurn, enemy -> enemyAct.
@@ -66,19 +75,28 @@ export function Battle() {
     startBgm('battle');
   }, []);
 
-  // Floating damage number on lastDamage change
+  // Hit reactions on lastDamage change: floating number + hit-flash + attacker lunge.
   useEffect(() => {
     if (!battle?.lastDamage) return;
+    const { target, amount, crit, kind } = battle.lastDamage;
     dmgKeyRef.current += 1;
-    setFloatingDmg({
-      key: dmgKeyRef.current,
-      target: battle.lastDamage.target,
-      amount: battle.lastDamage.amount,
-      crit: battle.lastDamage.crit,
-      kind: battle.lastDamage.kind ?? 'damage',
-    });
-    const t = setTimeout(() => setFloatingDmg(null), 1000);
-    return () => clearTimeout(t);
+    const key = dmgKeyRef.current;
+    const dmgKind = kind ?? 'damage';
+
+    setFloatingDmg({ key, target, amount, crit, kind: dmgKind });
+    setHitFlash({ key, target, kind: dmgKind, crit: crit ?? false });
+    setLungeAttacker(
+      dmgKind === 'damage' ? (target === 'enemy' ? 'player' : 'enemy') : null,
+    );
+
+    const tFloat = setTimeout(() => setFloatingDmg(null), 1000);
+    const tFlash = setTimeout(() => setHitFlash(null), 350);
+    const tLunge = setTimeout(() => setLungeAttacker(null), 280);
+    return () => {
+      clearTimeout(tFloat);
+      clearTimeout(tFlash);
+      clearTimeout(tLunge);
+    };
   }, [battle?.lastDamage]);
 
   if (!battle) return null;
@@ -91,7 +109,23 @@ export function Battle() {
       <div className="battle-stage">
         {/* Enemy */}
         <div className={`combatant combatant-enemy${shakeEnemy ? ' shake' : ''}`}>
-          <div className="combatant-portrait">{enemy.emoji}</div>
+          <div
+            className={`combatant-portrait${
+              lungeAttacker === 'enemy' ? ' lunge-down' : ''
+            }${
+              hitFlash?.target === 'enemy' && hitFlash.crit ? ' crit-impact' : ''
+            }${
+              phase === 'won' ? ' defeated' : ''
+            }`}
+          >
+            {enemy.emoji}
+            {hitFlash?.target === 'enemy' && (
+              <span
+                key={hitFlash.key}
+                className={`hit-flash${hitFlash.kind === 'heal' ? ' heal' : ''}`}
+              />
+            )}
+          </div>
           <div className="combatant-name">{enemy.name}</div>
           <HpBar current={enemyCurrentHp} max={enemy.maxHp} variant="hp" />
           {floatingDmg && floatingDmg.target === 'enemy' && (
@@ -108,7 +142,23 @@ export function Battle() {
 
         {/* Player */}
         <div className={`combatant combatant-player${shakePlayer ? ' shake' : ''}${player.defending ? ' defending' : ''}`}>
-          <div className="combatant-portrait">🧙</div>
+          <div
+            className={`combatant-portrait${
+              lungeAttacker === 'player' ? ' lunge-up' : ''
+            }${
+              hitFlash?.target === 'player' && hitFlash.crit ? ' crit-impact' : ''
+            }${
+              phase === 'lost' ? ' defeated' : ''
+            }`}
+          >
+            🧙
+            {hitFlash?.target === 'player' && (
+              <span
+                key={hitFlash.key}
+                className={`hit-flash${hitFlash.kind === 'heal' ? ' heal' : ''}`}
+              />
+            )}
+          </div>
           <div className="combatant-name">{player.name} Lv.{player.level}</div>
           <HpBar label="HP" current={player.hp} max={player.maxHp} variant="hp" />
           <HpBar label="MP" current={player.mp} max={player.maxMp} variant="mp" />
