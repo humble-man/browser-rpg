@@ -592,6 +592,7 @@ input, textarea {
   line-height: 1;
   margin-bottom: 4px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  position: relative;
 }
 
 .combatant-name {
@@ -651,6 +652,49 @@ input, textarea {
   0% { transform: translate(-50%, 0); opacity: 1; }
   60% { opacity: 1; }
   100% { transform: translate(-50%, -50px); opacity: 0; }
+}
+
+.combatant-portrait.lunge-up    { animation: lunge-up    250ms ease-out; }
+.combatant-portrait.lunge-down  { animation: lunge-down  250ms ease-out; }
+.combatant-portrait.crit-impact { animation: crit-impact 300ms ease-out; }
+.combatant-portrait.defeated    { animation: defeated-fade 800ms ease-in forwards; }
+
+@keyframes lunge-up {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-24px); }
+}
+
+@keyframes lunge-down {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(24px); }
+}
+
+@keyframes crit-impact {
+  0%, 100% { transform: scale(1); }
+  40%      { transform: scale(1.25); }
+}
+
+@keyframes defeated-fade {
+  to { opacity: 0; transform: translateY(30px); }
+}
+
+.hit-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 64, 64, 0.7), transparent 70%);
+  pointer-events: none;
+  animation: hit-flash-anim 200ms ease-out;
+  z-index: 1;
+}
+
+.hit-flash.heal {
+  background: radial-gradient(circle, rgba(64, 240, 128, 0.7), transparent 70%);
+}
+
+@keyframes hit-flash-anim {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .bar-wrap {
